@@ -1,6 +1,6 @@
 {
   "name": "@firecubez/req",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "A package manager to eliminate the need for recursive dependencies",
   "main": "index.js",
   "scripts": {
@@ -19,7 +19,5 @@
     "url": "https://github.com/FireCubez/Req/issues"
   },
   "homepage": "https://github.com/FireCubez/Req#readme",
-  "dependencies": {
-    "verb": "^0.8.10"
-  }
+  "dependencies": {}
 }
