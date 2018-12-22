@@ -1,0 +1,25 @@
+{
+  "name": "req",
+  "version": "1.2.0",
+  "description": "A package manager to eliminate the need for recursive dependencies",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/FireCubez/Req.git"
+  },
+  "keywords": [
+    "package"
+  ],
+  "author": "FireCubez",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/FireCubez/Req/issues"
+  },
+  "homepage": "https://github.com/FireCubez/Req#readme",
+  "dependencies": {
+    "verb": "^0.8.10"
+  }
+}

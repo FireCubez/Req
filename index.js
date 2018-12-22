@@ -30,7 +30,24 @@ function Giver(deps, impls) {
 			} else if(e.def in Req.module.__modules__) {
 				impl = Req.module.__modules__[e.def];
 			} else {
-				throw new Error("Module not found: " + e.name + (e.desc ? " (" + e.desc + ")" : ""));
+				let r;
+				try {
+					r = require(e.name);
+				} catch(err) {
+					if(!err.message.startsWith("Cannot find module")) {
+						throw new Error("An error occured while loading " + e.name + ":" + err.toString());
+					}
+					else try {
+						r = require(e.def);
+					} catch(err) {
+						if(!err.message.startsWith("Cannot find module")) {
+							throw new Error("An error occured while loading " + e.name + ":" + err.toString());
+						} else {
+							throw new Error("Module not found: " + e.name + (e.desc ? " (" + e.desc + ")" : ""));
+						}
+					}
+				}
+				impl = r.__Is_Req_Module__ ? r : Req.anonymousModule(null, $ => r);
 			}
 		} else {
 			impl = impls[e.name];
@@ -49,13 +66,45 @@ function Giver(deps, impls) {
 	});
 }
 
-Giver.prototype.get = function(name) {
+Giver.prototype.get = function(name, deps) {
 	if(!(name in this.__impls__)) throw new Error("Module not found: " + name);
-	return this.__impls__[name];
+	var impl = this.__impls__[name];
+	if(impl.__Req_Deprecate__) {
+		Req.warn(name, impl.__Req_Deprecate__());
+		let t = impl.__Req_Deprecate_Target__;
+		if(t) {
+			if(typeof t === "string") impl = Req.get(t);
+			else impl = t;
+		}
+	}
+	if(deps) return impl(deps);
+	else return impl;
 }
 
+Req.get = function(name, deps) {
+	var impl;
+	if(name in Req.module.__modules__) impl = Req.module.__modules__[name];
+	else {
+		try {
+			impl = require(name);
+		} catch(err) {
+			throw new Error("Module not found: " + name);
+		}
+	}
+	if(impl.__Req_Deprecate__) {
+		Req.warn(name, impl.__Req_Deprecate__());
+		let t = impl.__Req_Deprecate_Target__;
+		if(t) {
+			if(typeof t === "string") impl = Req.get(t);
+			else impl = t;
+		}
+	}
+	if(deps) return impl(deps);
+	else return impl;
+}
 Req.module = function(name, definerFunc, runner) {
 	var mod = Req.anonymousModule(definerFunc, runner);
+	mod.moduleName = name;
 	Req.module.__modules__[name] = mod;
 	return mod;
 }
@@ -65,12 +114,24 @@ Req.anonymousModule = function(definerFunc, runner) {
 	if(typeof definerFunc === "function") {
 		definerFunc(definer);
 	}
-	return function(impls = {}) {
+	var m = function Module(impls = {}) {
 		var giver = new Giver(definer.__dependencies__, impls);
 		return runner(giver);
 	};
+	// Metadata
+	m.__Is_Req_Module__ = true;
+	m.moduleName = null;
+	return m;
 }
 
+Req.deprecate = function(mod, func, repl) {
+	mod.__Req_Deprecate__ = func;
+	mod.__Req_Deprecate_Target__ = repl;
+}
+
+Req.warn = function(name, msg) {
+	console.warn("Req: [WARN] " + name + ": " + msg);
+}
 Req.module.__modules__ = Object.create(null);
 
 module.exports = exports = Req;
