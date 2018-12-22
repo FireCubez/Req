@@ -1,7 +1,7 @@
 const Req = {};
 function Definer() {
 	this.__dependencies__ = [];
-};
+}
 
 Definer.prototype.depend = function(...a) {
 	if(a.length === 1) {
@@ -37,17 +37,19 @@ function Giver(deps, impls) {
 					if(!err.message.startsWith("Cannot find module")) {
 						throw new Error("An error occured while loading " + e.name + ":" + err.toString());
 					}
-					else try {
-						r = require(e.def);
-					} catch(err) {
-						if(!err.message.startsWith("Cannot find module")) {
-							throw new Error("An error occured while loading " + e.name + ":" + err.toString());
-						} else {
-							throw new Error("Module not found: " + e.name + (e.desc ? " (" + e.desc + ")" : ""));
+					else {
+						try {
+							r = require(e.def);
+						} catch(err2) {
+							if(!err2.message.startsWith("Cannot find module")) {
+								throw new Error("An error occured while loading " + e.name + ":" + err2.toString());
+							} else {
+								throw new Error("Module not found: " + e.name + (e.desc ? " (" + e.desc + ")" : ""));
+							}
 						}
 					}
 				}
-				impl = r.__Is_Req_Module__ ? r : Req.anonymousModule(null, $ => r);
+				impl = r.__Is_Req_Module__ ? r : Req.anonymousModule(null, () => r);
 			}
 		} else {
 			impl = impls[e.name];
@@ -55,7 +57,7 @@ function Giver(deps, impls) {
 		if(e.interface) {
 			let called = impl();
 			Object.keys(e.interface).forEach(key => {
-				if(!key in called) {
+				if(!(key in called)) {
 					throw new Error("Property `" + key + "` not implemented in module `" + e.name + "`");
 				} else if(!e.interface[key](called[key])) {
 					throw new Error("Implementation failed test for property `" + key + "` in module `" + e.name + "`");
