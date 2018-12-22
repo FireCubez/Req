@@ -1,4 +1,9 @@
 # Req
+
+[![](https://img.shields.io/bundlephobia/min/@firecubez/req.svg)](https://github.com/FireCubez/Req)
+[![](https://img.shields.io/github/license/FireCubez/Req.svg)](https://github.com/FireCubez/Req/)
+[![](https://img.shields.io/badge/dependencies-none-brightgreen.svg)](https://github.com/FireCubez/Req/)
+
 A package manager to eliminate the need for recursive dependencies, and allow for flexibility with dependencies
 
 # Installation
