@@ -1,21 +1,27 @@
-#!bin/env node --harmony
-const fs  = require("fs");
-var main  = process.argv[2];
-var dir   = process.argv[3];
+#!/usr/bin/env node --harmony
+const fs   = require("fs");
+const path = require("path");
+var main   = process.argv[2];
+var dir    = process.argv[3];
 if(!main || !dir) {
 	console.log(
-		`Usage:
-			reqpack <main> <dir> [out]
-		
-		Where:
-			<main> is the main file to be exported
-			<dir>  is the directory to bundle
-			[out]  the file to output to (default: stdout)`
+`Usage:
+	reqpack <main> <dir> [out]
+	==========================
+Where:
+	<main> is the main file to be exported
+	<dir>  is the directory to bundle
+	[out]  the file to output to (default: stdout)`
 	); process.exit(0);
 }
 var out   = process.argv[4];
 var open  = "(function(Req){return ";
-var close = "})(Req);";
+
+// To prevent against opening block comments and not
+// closing them, we start a line comment and add "*/"
+// followed by a newline to cancel out the line comment
+
+var close = "//*/\n})(Req);";
 var mstr  = "module.exports = exports = ";
 var d     = new Date();
 var str   = [
@@ -26,7 +32,7 @@ var str   = [
 	'const Req = require("Req");'
 ].join("\n");
 fs.readdirSync(dir).forEach(file => {
-	str += (file === main ? mstr : "") + open + fs.readFileSync(file).toString() + close;
+	str += (file === main ? mstr : "") + open + fs.readFileSync(path.join(dir,file)).toString() + close;
 });
 
 if(out) fs.writeFileSync(out, str);
