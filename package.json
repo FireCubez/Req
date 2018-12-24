@@ -4,7 +4,10 @@
   "description": "A package manager to eliminate the need for recursive dependencies",
   "main": "index.js",
   "scripts": {
-    "test": "eslint index.js"
+    "test": "eslint index.js && eslint ./reqpack/index.js"
+  },
+  "bin": {
+    "reqpack": "reqpack/index.js"
   },
   "repository": {
     "type": "git",
