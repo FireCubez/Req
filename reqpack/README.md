@@ -24,7 +24,7 @@ Then, to bundle everything up, run the following:
 $ reqpack main.js ./sourceDir bundled.js
 ```
 
-The output file exports the module in the main file for outer usage, and has a dependency on Req, so make sure to supply it.
+The output file exports the module in the main file for outer usage, and has a dependency on Req AND the external requirements (ex. `$$.depend("express")`).
 
 # Note
 
